@@ -11,14 +11,12 @@
   <iframe id="gasFrame" src=""></iframe>
 
   <script>
-    // ดึงชื่อจาก URL ของ GitHub
     const urlParams = new URLSearchParams(window.location.search);
     const kolName = urlParams.get('name') || '';
-
-    // ใส่ URL ของ Google Apps Script ที่ Deploy ไว้แล้วตรงนี้
+    
+    // ใส่ URL ของ Google Apps Script ของคุณที่นี่
     const gasUrl = "https://script.google.com/macros/s/AKfycbx7FTLAFTujj8gHWlFL38rc8mM_T0JiLWfna7Aq4JS5-Nsc-F2WAVSffUNNph2CuoZc/exec";
 
-    // สั่งให้ Iframe โหลดหน้าเว็บ GAS พร้อมส่งชื่อนักไลฟ์ไปด้วย
     document.getElementById('gasFrame').src = gasUrl + "?name=" + encodeURIComponent(kolName);
   </script>
 </body>
