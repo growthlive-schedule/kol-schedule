@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แจ้งคิวว่างนักไลฟ์</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 15px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    .locked-input { background-color: #e9ecef; color: #555; font-weight: bold; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .slot-btn { padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
+    .slot-btn.selected { background-color: #4CAF50; color: white; border-color: #4CAF50; }
+    .btn-submit { width: 100%; padding: 12px; background-color: #008CBA; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📅 แจ้งคิวว่าง (รายชั่วโมง)</h2>
+    <div class="form-group">
+      <label>ชื่อนักไลฟ์:</label>
+      <input type="text" id="kolName" class="locked-input" value="<?= kolName ?>" readonly>
+    </div>
+    <div class="form-group">
+      <label>เลือกวันที่ว่าง:</label>
+      <input type="date" id="dateInput">
+    </div>
+    <div class="form-group">
+      <label>เลือกรอบเวลาที่ว่าง:</label>
+      <div class="time-grid" id="timeGridContainer"></div>
+    </div>
+    <button id="submitBtn" class="btn-submit" onclick="submitData()">ส่งข้อมูลแจ้งคิวว่าง</button>
+  </div>
+
+  <script>
+    function generateTimeSlots() {
+      const container = document.getElementById('timeGridContainer');
+      for (let i = 0; i < 24; i++) {
+        let start = String(i).padStart(2, '0');
+        let end = String(i + 1).padStart(2, '0');
+        if (i === 23) end = '24';
+        let btn = document.createElement('button');
+        btn.className = 'slot-btn';
+        btn.innerText = `${start}:00 - ${end}:00`;
+        btn.onclick = function() { this.classList.toggle('selected'); };
+        container.appendChild(btn);
+      }
+    }
+    generateTimeSlots();
+
+    function submitData() {
+      const name = document.getElementById('kolName').value;
+      const date = document.getElementById('dateInput').value;
+      const selected = Array.from(document.querySelectorAll('.slot-btn.selected')).map(b => b.innerText);
+      
+      if (!name || !date || selected.length === 0) { alert("กรุณากรอกข้อมูลให้ครบครับ"); return; }
+      
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "กำลังบันทึก...";
+      btn.disabled = true;
+
+      // URL ของ Google Apps Script ที่ Deploy แล้ว
+      const gasUrl = "https://script.google.com/macros/s/AKfycbx7FTLAFTujj8gHWlFL38rc8mM_T0JiLWfna7Aq4JS5-Nsc-F2WAVSffUNNph2CuoZc/exec";
+      
+      // ส่งข้อมูลผ่าน google.script.run
+      google.script.run
+        .withSuccessHandler(() => { alert("บันทึกเรียบร้อย!"); location.reload(); })
+        .saveSchedule(name, date, selected);
+    }
+  </script>
+</body>
+</html>
